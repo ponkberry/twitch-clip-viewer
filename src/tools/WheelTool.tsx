@@ -215,8 +215,6 @@ export function WheelTool() {
             <svg
               className="wheel-svg"
               viewBox="0 0 200 200"
-              width={580}
-              height={580}
               style={{ transform: `rotate(${rotation}deg)`, transitionDuration: `${SPIN_DURATION_MS}ms` }}
             >
               {(() => {

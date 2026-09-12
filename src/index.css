@@ -858,6 +858,7 @@ main.stage.stage-tools{
 .wheel-tool-view{
   flex:1;
   min-width:0;
+  min-height:0;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -1057,15 +1058,37 @@ main.stage.stage-tools{
   font-size:12.5px;
 }
 .wheel-spin-area{
+  /* Explicit 100%x100% (rather than shrink-to-fit) plus container-type:size is what lets
+     .wheel-svg-wrap size itself off real available space below via cqw/cqh — a flex child
+     centered via align-items/justify-content on its own parent doesn't get a definite
+     width/height for free, and cqw/cqh need a sized container to query in the first place. */
+  container-type:size;
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
   display:flex;
   flex-direction:column;
   align-items:center;
+  justify-content:center;
   gap:16px;
 }
 .wheel-svg-wrap{
   position:relative;
+  /* min(100cqw, 100cqh) is the largest square that fits .wheel-spin-area's actual box — width
+     alone with aspect-ratio doesn't self-correct against max-height (aspect-ratio only fills in
+     a dimension that's otherwise unconstrained; with both width and max-height explicit it just
+     gets overridden, so the box ends up non-square instead of shrinking to fit). container-type
+     here turns THIS element's own resolved size into the reference for the pointer/button's cqw
+     units below, so they stay proportional no matter what size this resolves to. */
+  width:min(100cqw, 100cqh);
+  aspect-ratio:1 / 1;
+  container-type:size;
 }
 .wheel-svg{
+  width:100%;
+  height:100%;
+  display:block;
   border-radius:50%;
   transition-property:transform;
   transition-timing-function:cubic-bezier(0.12,0.65,0.13,1);
@@ -1073,15 +1096,17 @@ main.stage.stage-tools{
 .wheel-pointer{
   position:absolute;
   /* Tip lands right at the wheel's rim (the SVG circle sits inset ~4% into its viewBox) instead
-     of floating in the gap above it. */
-  top:-23px;
+     of floating in the gap above it. Sizes are the original fixed-px design's own ratios
+     (23/580, 21/580, 35/580) expressed as container query units, so the pointer scales exactly
+     with the wheel's actual rendered size — cqw and cqh are equal here since the wrap is square. */
+  top:-3.97cqw;
   left:50%;
   transform:translateX(-50%);
   width:0;
   height:0;
-  border-left:21px solid transparent;
-  border-right:21px solid transparent;
-  border-top:35px solid #0C0C0C;
+  border-left:3.62cqw solid transparent;
+  border-right:3.62cqw solid transparent;
+  border-top:6.03cqw solid #0C0C0C;
   /* box-shadow would just trace the (invisible) 0x0 box this border-triangle sits in — drop-shadow
      follows the actual rendered triangle shape instead. */
   filter:drop-shadow(0 2px 3px rgba(0,0,0,0.45));
@@ -1092,17 +1117,18 @@ main.stage.stage-tools{
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
-  width:130px;
-  height:130px;
+  /* 130/580 and 5/580 — the button's own ratios, same reasoning as the pointer above. */
+  width:22.41cqw;
+  height:22.41cqw;
   border-radius:50%;
   background:#0C0C0C;
   color:#F4EFDD;
-  border:5px solid var(--panel);
+  border:0.86cqw solid var(--panel);
   font-weight:700;
   font-family:'JetBrains Mono', monospace;
   text-transform:uppercase;
   letter-spacing:1px;
-  font-size:13px;
+  font-size:clamp(10px, 2.24cqw, 13px);
   cursor:pointer;
   transition:opacity .15s, transform .1s;
   z-index:3;
