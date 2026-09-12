@@ -38,62 +38,68 @@ export function Header({
 
   return (
     <header>
-      <div className="brand">
-        <h1>
-          Twitch Clip <span>Portal</span>
-        </h1>
+      <div className="header-top">
+        <div className="brand">
+          <h1>
+            Twitch <span>Portal</span>
+          </h1>
+        </div>
+
+        {status === 'signed-in' && (
+          <div className="header-search">
+            <button
+              className="header-search-icon"
+              disabled={searching}
+              onClick={onSearch}
+              aria-label="Search"
+              title="Search"
+            >
+              🔍
+            </button>
+            <input
+              type="text"
+              placeholder="Enter a channel name…"
+              value={channel}
+              onChange={(e) => onChannelChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') onSearch();
+              }}
+            />
+          </div>
+        )}
+
+        {status === 'signed-in' ? (
+          <div className="avatar-menu" ref={menuRef}>
+            <button className="avatar-btn" onClick={() => setMenuOpen((v) => !v)} aria-label="Account menu">
+              {profileImageUrl ? (
+                <img src={profileImageUrl} alt="" />
+              ) : (
+                <span className="avatar-fallback">{displayName?.[0]?.toUpperCase() ?? '?'}</span>
+              )}
+            </button>
+            {menuOpen && (
+              <div className="avatar-dropdown">
+                <div className="avatar-dropdown-name">{displayName}</div>
+                <button
+                  className="primary"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    disconnect();
+                  }}
+                >
+                  Disconnect
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="frame-count mono">{status === 'connecting' ? 'Connecting…' : 'Not connected'}</div>
+        )}
       </div>
 
-      {status === 'signed-in' && (
-        <div className="header-search">
-          <button
-            className="header-search-icon"
-            disabled={searching}
-            onClick={onSearch}
-            aria-label="Search"
-            title="Search"
-          >
-            🔍
-          </button>
-          <input
-            type="text"
-            placeholder="Enter a channel name…"
-            value={channel}
-            onChange={(e) => onChannelChange(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') onSearch();
-            }}
-          />
-        </div>
-      )}
-
-      {status === 'signed-in' ? (
-        <div className="avatar-menu" ref={menuRef}>
-          <button className="avatar-btn" onClick={() => setMenuOpen((v) => !v)} aria-label="Account menu">
-            {profileImageUrl ? (
-              <img src={profileImageUrl} alt="" />
-            ) : (
-              <span className="avatar-fallback">{displayName?.[0]?.toUpperCase() ?? '?'}</span>
-            )}
-          </button>
-          {menuOpen && (
-            <div className="avatar-dropdown">
-              <div className="avatar-dropdown-name">{displayName}</div>
-              <button
-                className="primary"
-                onClick={() => {
-                  setMenuOpen(false);
-                  disconnect();
-                }}
-              >
-                Disconnect
-              </button>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="frame-count mono">{status === 'connecting' ? 'Connecting…' : 'Not connected'}</div>
-      )}
+      <div className="sub-header">
+        <span className="sub-header-item active">Clips</span>
+      </div>
     </header>
   );
 }
