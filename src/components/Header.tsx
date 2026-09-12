@@ -40,8 +40,9 @@ export function Header({
     <header>
       <div className="brand">
         <h1>
-          Twitch Clip <span>Portal</span>
+          Twitch <span>Portal</span>
         </h1>
+        <span className="tag">Clips</span>
       </div>
 
       {status === 'signed-in' && (
