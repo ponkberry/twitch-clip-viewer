@@ -10,6 +10,10 @@
   --danger: #E8735D;
   --radius: 10px;
   --stage-pad: clamp(16px,3vw,40px);
+  /* Shared row height for the tools nav's icon row and the content pane's title row, so their
+     dividers land at the same y position regardless of the very different content (emoji icon
+     vs heading text) each row centers. */
+  --tools-header-h: 40px;
 }
 *{box-sizing:border-box;}
 html,body,#root{height:100%;}
@@ -553,7 +557,9 @@ main.stage.stage-tools{
 }
 .tools-layout{
   display:flex;
-  gap:20px;
+  /* Matches main.stage's own right/bottom padding so the nav-to-content gap equals the
+     content-to-screen-edge gap on every side. */
+  gap: var(--stage-pad);
   height:100%;
 }
 .tools-nav{
@@ -577,25 +583,32 @@ main.stage.stage-tools{
 .tools-layout.collapsed .tools-nav{
   width:64px;
 }
-.tools-layout.collapsed .tools-nav-toggle{
-  text-align:center;
-}
 .tools-nav-toggle{
   align-self:stretch;
+  display:flex;
+  align-items:center;
+  height:var(--tools-header-h);
   text-align:left;
   background:none;
   border:0;
   color:var(--text-dim);
   cursor:pointer;
   font-size:26px;
-  padding:4px 0;
+  padding:0;
+}
+.tools-layout.collapsed .tools-nav-toggle{
+  justify-content:center;
 }
 .tools-nav-divider{
+  flex-shrink:0;
   border-bottom:1px solid var(--line);
-  margin:4px 0 8px;
+  margin:0 0 8px;
 }
 .tools-nav-toggle:hover{color:var(--leaf);}
 .tools-nav-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
   text-align:left;
   background:none;
   border:0;
@@ -609,20 +622,94 @@ main.stage.stage-tools{
   overflow:hidden;
   text-overflow:ellipsis;
 }
+.tools-nav-item svg{flex-shrink:0;}
+.tools-nav-item span{overflow:hidden; text-overflow:ellipsis;}
 .tools-nav-item:hover{color:var(--text); background:var(--panel-raised);}
 .tools-nav-item.active{color:var(--leaf); background:var(--panel-raised);}
+.tools-layout.collapsed .tools-nav-item{
+  justify-content:center;
+  padding:8px 0;
+}
 .tools-nav-empty{padding:8px 10px;}
 .tools-page{
   flex:1;
   min-width:0;
-  padding:24px clamp(16px,3vw,32px);
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  /* Matches .tools-nav's own gap so the title-to-divider spacing is identical and the two
+     dividers land on the same line instead of one sitting 4px higher than the other. */
+  gap:4px;
+  /* Bleeds the whole column up to reclaim main.stage's top padding — same trick as .tools-nav —
+     so the title has room to sit level with the nav icons AND have its own visible padding
+     without eating into .tools-page-body's height (that reclaimed space pays for it instead). */
+  margin-top: calc(-1 * var(--stage-pad));
 }
-.tools-page h2{
-  margin:0 0 8px;
+.tools-page-title{
+  flex-shrink:0;
+  height:var(--tools-header-h);
+  margin:0;
   font-family:'Archivo Black', sans-serif;
   text-transform:uppercase;
   letter-spacing:0.5px;
   font-size:20px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.tools-page-divider{
+  flex-shrink:0;
+  border-bottom:1px solid var(--line);
+}
+.tools-page-body{
+  flex:1;
+  min-height:0;
+  padding:24px clamp(16px,3vw,32px);
+}
+.rng-tool{
+  margin-top:14px;
+}
+.rng-tool-row{
+  display:flex;
+  align-items:flex-end;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.rng-tool-field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  color:var(--text-dim);
+}
+.rng-tool-field input[type=number]{
+  width:110px;
+  font-size:13px;
+  padding:8px 10px;
+}
+.rng-tool-roll{
+  display:flex;
+  gap:10px;
+  margin-top:22px;
+  background:none;
+  border:0;
+  padding:0;
+  color:var(--text-dim);
+  cursor:pointer;
+  transition:color .15s, transform .1s;
+}
+.rng-tool-roll:hover{color:var(--leaf);}
+.rng-tool-roll:active{transform:scale(0.95);}
+.rng-tool-result{
+  margin-top:18px;
+  font-family:'Archivo Black', sans-serif;
+  font-size:36px;
+  color:var(--leaf);
 }
 .tabs{
   display:flex;
