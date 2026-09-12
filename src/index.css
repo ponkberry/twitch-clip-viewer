@@ -10,6 +10,10 @@
   --danger: #E8735D;
   --radius: 10px;
   --stage-pad: clamp(16px,3vw,40px);
+  /* Shared row height for the tools nav's icon row and the content pane's title row, so their
+     dividers land at the same y position regardless of the very different content (emoji icon
+     vs heading text) each row centers. */
+  --tools-header-h: 40px;
 }
 *{box-sizing:border-box;}
 html,body,#root{height:100%;}
@@ -553,7 +557,9 @@ main.stage.stage-tools{
 }
 .tools-layout{
   display:flex;
-  gap:20px;
+  /* Matches main.stage's own right/bottom padding so the nav-to-content gap equals the
+     content-to-screen-edge gap on every side. */
+  gap: var(--stage-pad);
   height:100%;
 }
 .tools-nav{
@@ -577,25 +583,32 @@ main.stage.stage-tools{
 .tools-layout.collapsed .tools-nav{
   width:64px;
 }
-.tools-layout.collapsed .tools-nav-toggle{
-  text-align:center;
-}
 .tools-nav-toggle{
   align-self:stretch;
+  display:flex;
+  align-items:center;
+  height:var(--tools-header-h);
   text-align:left;
   background:none;
   border:0;
   color:var(--text-dim);
   cursor:pointer;
   font-size:26px;
-  padding:4px 0;
+  padding:0;
+}
+.tools-layout.collapsed .tools-nav-toggle{
+  justify-content:center;
 }
 .tools-nav-divider{
+  flex-shrink:0;
   border-bottom:1px solid var(--line);
-  margin:4px 0 8px;
+  margin:0 0 8px;
 }
 .tools-nav-toggle:hover{color:var(--leaf);}
 .tools-nav-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
   text-align:left;
   background:none;
   border:0;
@@ -609,20 +622,229 @@ main.stage.stage-tools{
   overflow:hidden;
   text-overflow:ellipsis;
 }
+.tools-nav-item svg{flex-shrink:0;}
+.tools-nav-item span{overflow:hidden; text-overflow:ellipsis;}
 .tools-nav-item:hover{color:var(--text); background:var(--panel-raised);}
 .tools-nav-item.active{color:var(--leaf); background:var(--panel-raised);}
+.tools-layout.collapsed .tools-nav-item{
+  justify-content:center;
+  padding:8px 0;
+}
 .tools-nav-empty{padding:8px 10px;}
 .tools-page{
   flex:1;
   min-width:0;
-  padding:24px clamp(16px,3vw,32px);
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  /* Matches .tools-nav's own gap so the title-to-divider spacing is identical and the two
+     dividers land on the same line instead of one sitting 4px higher than the other. */
+  gap:4px;
+  /* Bleeds the whole column up to reclaim main.stage's top padding — same trick as .tools-nav —
+     so the title has room to sit level with the nav icons AND have its own visible padding
+     without eating into .tools-page-body's height (that reclaimed space pays for it instead). */
+  margin-top: calc(-1 * var(--stage-pad));
 }
-.tools-page h2{
-  margin:0 0 8px;
+.tools-page-title{
+  flex-shrink:0;
+  height:var(--tools-header-h);
+  margin:0;
   font-family:'Archivo Black', sans-serif;
   text-transform:uppercase;
   letter-spacing:0.5px;
   font-size:20px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.tools-page-divider{
+  flex-shrink:0;
+  border-bottom:1px solid var(--line);
+}
+.tools-page-body{
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  padding:24px clamp(16px,3vw,32px);
+}
+.rng-tool{
+  flex:1;
+  min-height:0;
+  display:flex;
+  gap:24px;
+  align-items:stretch;
+}
+.rng-tool-config{
+  flex:0 0 25%;
+  min-width:0;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+.rng-tool-results{
+  flex:1;
+  min-width:0;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  padding-left:24px;
+  border-left:1px solid var(--line);
+}
+.rng-tool-heading{
+  flex-shrink:0;
+  font-family:'JetBrains Mono', monospace;
+  font-size:14px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--text-dim);
+  margin-bottom:12px;
+}
+.rng-tool-heading-secondary{
+  margin-top:22px;
+}
+.rng-tool-row{
+  display:flex;
+  align-items:flex-end;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.rng-tool-field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  color:var(--text-dim);
+}
+.rng-tool-mode-field{
+  margin-top:12px;
+}
+.rng-tool-field input[type=number]{
+  width:110px;
+  height:37px;
+  font-size:13px;
+  padding:8px 10px;
+}
+.rng-tool-mode-toggle{
+  display:flex;
+  gap:6px;
+  height:37px;
+}
+.rng-tool-mode-btn{
+  display:flex;
+  align-items:center;
+  height:100%;
+  background:var(--panel-raised);
+  border:1px solid var(--line);
+  color:var(--text-dim);
+  font-family:'JetBrains Mono', monospace;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  padding:0 12px;
+  border-radius:6px;
+  cursor:pointer;
+  transition:border-color .15s, color .15s;
+}
+.rng-tool-mode-btn:hover{color:var(--text);}
+.rng-tool-mode-btn.active{border-color:var(--leaf); color:var(--leaf);}
+.rng-tool-mode-btn:disabled{cursor:default; opacity:0.5;}
+.rng-tool-roll-wrap{
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
+.rng-tool-roll{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  background:none;
+  border:0;
+  padding:0;
+  color:var(--text-dim);
+  cursor:pointer;
+  transition:color .15s, transform .1s;
+}
+.rng-tool-roll-dice{
+  display:flex;
+  gap:14px;
+}
+.rng-tool-roll-label{
+  font-family:'JetBrains Mono', monospace;
+  font-size:13px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+.rng-tool-roll:hover{color:var(--leaf);}
+.rng-tool-roll:active{transform:scale(0.95);}
+.rng-tool-roll:disabled{cursor:default; opacity:0.5;}
+.rng-tool-roll:disabled:hover{color:var(--text-dim);}
+.rng-tool-roll:disabled:active{transform:none;}
+.rng-tool-result{
+  flex-shrink:0;
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+}
+.rng-tool-result-value{
+  font-family:'Archivo Black', sans-serif;
+  font-size:44px;
+  color:var(--leaf);
+  line-height:1;
+}
+.rng-tool-result-value.rolling{
+  color:var(--text-dim);
+}
+.rng-tool-attempt{
+  font-family:'JetBrains Mono', monospace;
+  font-size:12px;
+  color:var(--text-dim);
+}
+.rng-tool-heading .rng-tool-attempt{
+  margin-left:8px;
+}
+.rng-tool-history{
+  flex:1;
+  min-height:0;
+  margin-top:4px;
+  display:flex;
+  gap:24px;
+  /* Every result is kept — no cap, no dropping old ones. Each column holds as many groups as
+     fit its measured height (see the columnCapacity calc in RngTool.tsx); once a column is
+     full, a new one starts rather than overflowing vertically, so this only ever needs to
+     scroll horizontally once there are more columns than fit the panel's width. */
+  overflow-x:auto;
+  overflow-y:hidden;
+}
+.rng-tool-history-col{
+  flex:0 0 auto;
+  display:flex;
+  flex-direction:column;
+}
+.rng-tool-history-group{
+  margin-bottom:16px;
+}
+.rng-tool-history-group:last-child{
+  margin-bottom:0;
+}
+.rng-tool-history-item{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:13px;
+  color:var(--text-dim);
+  padding:5px 0;
 }
 .tabs{
   display:flex;
