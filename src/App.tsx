@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Clip } from './types';
+import type { Clip, Section } from './types';
 import { useTwitchAuth } from './hooks/useTwitchAuth';
 import { useChannelSearch } from './hooks/useChannelSearch';
 import { usePlaylists } from './hooks/usePlaylists';
@@ -10,12 +10,14 @@ import { ChannelDetails } from './components/ChannelDetails';
 import { Player } from './components/Player';
 import { PlaylistPanel } from './components/PlaylistPanel';
 import { Loading } from './components/Loading';
+import { ToolsPage } from './components/ToolsPage';
 
 export default function App() {
   const { status, clientId, accessToken, displayName, profileImageUrl, error, connect, disconnect } = useTwitchAuth();
   const search = useChannelSearch(clientId, accessToken ?? '');
   const playlists = usePlaylists();
 
+  const [section, setSection] = useState<Section>('clips');
   const [activeClip, setActiveClip] = useState<Clip | null>(null);
   const [addToListError, setAddToListError] = useState<string | null>(null);
 
@@ -47,10 +49,14 @@ export default function App() {
         onChannelChange={search.setChannel}
         onSearch={search.handleSearch}
         searching={search.searching}
+        section={section}
+        onSectionChange={setSection}
       />
       <div className="local-time-note">All dates and times shown are your local time.</div>
       <main className="stage">
-        {status === 'connecting' ? (
+        {section === 'tools' ? (
+          <ToolsPage />
+        ) : status === 'connecting' ? (
           <Loading />
         ) : status === 'signed-in' && accessToken ? (
           <div className="workspace">

@@ -55,8 +55,12 @@ header{
   text-transform:uppercase;
   color:var(--text-dim);
   padding:10px 0;
+  border:0;
   border-bottom:2px solid transparent;
+  background:none;
+  cursor:pointer;
 }
+.sub-header-item:hover{color:var(--text);}
 .sub-header-item.active{
   color:var(--leaf);
   border-bottom-color:var(--leaf);
@@ -542,6 +546,16 @@ main.stage{
   border:1px solid var(--line);
   border-radius:var(--radius);
   overflow:hidden;
+}
+.tools-page{
+  padding:24px clamp(16px,3vw,32px);
+}
+.tools-page h2{
+  margin:0 0 8px;
+  font-family:'Archivo Black', sans-serif;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  font-size:20px;
 }
 .tabs{
   display:flex;
