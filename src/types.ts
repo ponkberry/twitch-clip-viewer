@@ -55,3 +55,5 @@ export interface Playlist {
   name: string;
   clips: Clip[];
 }
+
+export type Section = 'clips' | 'tools';

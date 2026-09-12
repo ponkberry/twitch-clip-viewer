@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { TwitchAuthStatus } from '../hooks/useTwitchAuth';
+import type { Section } from '../types';
 
 interface HeaderProps {
   status: TwitchAuthStatus;
@@ -10,6 +11,8 @@ interface HeaderProps {
   onChannelChange: (value: string) => void;
   onSearch: () => void;
   searching: boolean;
+  section: Section;
+  onSectionChange: (section: Section) => void;
 }
 
 export function Header({
@@ -21,6 +24,8 @@ export function Header({
   onChannelChange,
   onSearch,
   searching,
+  section,
+  onSectionChange,
 }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -45,7 +50,7 @@ export function Header({
           </h1>
         </div>
 
-        {status === 'signed-in' && (
+        {status === 'signed-in' && section === 'clips' && (
           <div className="header-search">
             <button
               className="header-search-icon"
@@ -98,7 +103,18 @@ export function Header({
       </div>
 
       <div className="sub-header">
-        <span className="sub-header-item active">Clips</span>
+        <button
+          className={`sub-header-item${section === 'clips' ? ' active' : ''}`}
+          onClick={() => onSectionChange('clips')}
+        >
+          Clips
+        </button>
+        <button
+          className={`sub-header-item${section === 'tools' ? ' active' : ''}`}
+          onClick={() => onSectionChange('tools')}
+        >
+          Tools
+        </button>
       </div>
     </header>
   );
