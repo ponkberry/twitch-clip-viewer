@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import type { Clip, Section } from './types';
+import type { Clip } from './types';
 import { useTwitchAuth } from './hooks/useTwitchAuth';
 import { useChannelSearch } from './hooks/useChannelSearch';
 import { usePlaylists } from './hooks/usePlaylists';
+import { useRoute } from './hooks/useRoute';
 import { Header } from './components/Header';
 import { TwitchAuth } from './components/TwitchAuth';
 import { ChannelResults } from './components/ChannelResults';
@@ -17,7 +18,7 @@ export default function App() {
   const search = useChannelSearch(clientId, accessToken ?? '');
   const playlists = usePlaylists();
 
-  const [section, setSection] = useState<Section>('clips');
+  const { section, navigate } = useRoute();
   const [activeClip, setActiveClip] = useState<Clip | null>(null);
   const [addToListError, setAddToListError] = useState<string | null>(null);
 
@@ -50,7 +51,7 @@ export default function App() {
         onSearch={search.handleSearch}
         searching={search.searching}
         section={section}
-        onSectionChange={setSection}
+        onSectionChange={navigate}
       />
       <div className="local-time-note">All dates and times shown are your local time.</div>
       <main className="stage">

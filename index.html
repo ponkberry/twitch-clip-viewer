@@ -11,6 +11,17 @@
     />
   </head>
   <body>
+    <script>
+      // Restores the path 404.html stashed when GitHub Pages couldn't serve a route like
+      // /tools directly (see public/404.html) — must run before React mounts and reads the URL.
+      (function () {
+        var redirect = sessionStorage.getItem('spa-redirect-path');
+        if (redirect) {
+          sessionStorage.removeItem('spa-redirect-path');
+          history.replaceState(null, '', redirect);
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
