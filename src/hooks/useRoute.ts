@@ -6,33 +6,43 @@ import type { Section } from '../types';
 // duplicating it here.
 const BASE = import.meta.env.BASE_URL;
 
-function sectionFromPath(pathname: string): Section {
-  const relative = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname.replace(/^\//, '');
-  return relative.split('/')[0] === 'tools' ? 'tools' : 'clips';
+interface Route {
+  section: Section;
+  toolId: string | null;
 }
 
-function pathForSection(section: Section): string {
-  return section === 'tools' ? `${BASE}tools` : BASE;
+function parseRoute(pathname: string): Route {
+  const relative = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname.replace(/^\//, '');
+  const [first, second] = relative.split('/');
+  if (first === 'tools') return { section: 'tools', toolId: second || null };
+  return { section: 'clips', toolId: null };
+}
+
+function pathForRoute(section: Section, toolId: string | null): string {
+  if (section !== 'tools') return BASE;
+  return toolId ? `${BASE}tools/${toolId}` : `${BASE}tools`;
 }
 
 export function useRoute() {
-  const [section, setSection] = useState<Section>(() => sectionFromPath(location.pathname));
+  const [route, setRoute] = useState<Route>(() => parseRoute(location.pathname));
 
   useEffect(() => {
     function onPopState() {
-      setSection(sectionFromPath(location.pathname));
+      setRoute(parseRoute(location.pathname));
     }
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
-  const navigate = useCallback((next: Section) => {
-    const path = pathForSection(next);
+  // toolId defaults to null so switching top-level sections (e.g. clicking the "Tools" tab)
+  // always lands on the tool list rather than whatever specific tool was last open.
+  const navigate = useCallback((section: Section, toolId: string | null = null) => {
+    const path = pathForRoute(section, toolId);
     if (path !== location.pathname) {
       history.pushState(null, '', path);
     }
-    setSection(next);
+    setRoute({ section, toolId });
   }, []);
 
-  return { section, navigate };
+  return { section: route.section, toolId: route.toolId, navigate };
 }

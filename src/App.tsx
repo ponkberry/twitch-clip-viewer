@@ -18,7 +18,7 @@ export default function App() {
   const search = useChannelSearch(clientId, accessToken ?? '');
   const playlists = usePlaylists();
 
-  const { section, navigate } = useRoute();
+  const { section, toolId, navigate } = useRoute();
   const [activeClip, setActiveClip] = useState<Clip | null>(null);
   const [addToListError, setAddToListError] = useState<string | null>(null);
 
@@ -53,10 +53,12 @@ export default function App() {
         section={section}
         onSectionChange={navigate}
       />
-      <div className="local-time-note">All dates and times shown are your local time.</div>
-      <main className="stage">
+      {section === 'clips' && (
+        <div className="local-time-note">All dates and times shown are your local time.</div>
+      )}
+      <main className={`stage${section === 'tools' ? ' stage-tools' : ''}`}>
         {section === 'tools' ? (
-          <ToolsPage />
+          <ToolsPage toolId={toolId} onSelectTool={(id) => navigate('tools', id)} />
         ) : status === 'connecting' ? (
           <Loading />
         ) : status === 'signed-in' && accessToken ? (

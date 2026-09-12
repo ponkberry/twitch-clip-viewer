@@ -9,6 +9,7 @@
   --text-dim: #A6B2BE;
   --danger: #E8735D;
   --radius: 10px;
+  --stage-pad: clamp(16px,3vw,40px);
 }
 *{box-sizing:border-box;}
 html,body,#root{height:100%;}
@@ -494,9 +495,12 @@ header{
 }
 
 main.stage{
-  padding: clamp(16px,3vw,40px);
+  padding: var(--stage-pad);
   flex:1;
   min-height:0;
+}
+main.stage.stage-tools{
+  padding-left:0;
 }
 .player-shell{
   position:relative;
@@ -547,7 +551,70 @@ main.stage{
   border-radius:var(--radius);
   overflow:hidden;
 }
+.tools-layout{
+  display:flex;
+  gap:20px;
+  height:100%;
+}
+.tools-nav{
+  flex-shrink:0;
+  width:200px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  /* Negative top/bottom margins cancel main.stage's own padding (see .stage-tools for the
+     matching left-side cancellation) so the border-right bleeds edge-to-edge — from the
+     header down to the bottom of the viewport — instead of stopping at the stage's inset.
+     No compensating top padding: the toggle sits flush against the header, square with it. */
+  margin-top: calc(-1 * var(--stage-pad));
+  margin-bottom: calc(-1 * var(--stage-pad));
+  padding-bottom: var(--stage-pad);
+  padding-left:12px;
+  padding-right:12px;
+  border-right:1px solid var(--line);
+  transition:width .15s;
+}
+.tools-layout.collapsed .tools-nav{
+  width:64px;
+}
+.tools-layout.collapsed .tools-nav-toggle{
+  text-align:center;
+}
+.tools-nav-toggle{
+  align-self:stretch;
+  text-align:left;
+  background:none;
+  border:0;
+  color:var(--text-dim);
+  cursor:pointer;
+  font-size:26px;
+  padding:4px 0;
+}
+.tools-nav-divider{
+  border-bottom:1px solid var(--line);
+  margin:4px 0 8px;
+}
+.tools-nav-toggle:hover{color:var(--leaf);}
+.tools-nav-item{
+  text-align:left;
+  background:none;
+  border:0;
+  border-radius:6px;
+  padding:8px 10px;
+  color:var(--text-dim);
+  font-size:13px;
+  cursor:pointer;
+  transition:background .15s, color .15s;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.tools-nav-item:hover{color:var(--text); background:var(--panel-raised);}
+.tools-nav-item.active{color:var(--leaf); background:var(--panel-raised);}
+.tools-nav-empty{padding:8px 10px;}
 .tools-page{
+  flex:1;
+  min-width:0;
   padding:24px clamp(16px,3vw,32px);
 }
 .tools-page h2{
