@@ -666,10 +666,44 @@ main.stage.stage-tools{
 .tools-page-body{
   flex:1;
   min-height:0;
+  display:flex;
+  flex-direction:column;
   padding:24px clamp(16px,3vw,32px);
 }
 .rng-tool{
-  margin-top:14px;
+  flex:1;
+  min-height:0;
+  display:flex;
+  gap:24px;
+  align-items:stretch;
+}
+.rng-tool-config{
+  flex:0 0 25%;
+  min-width:0;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+.rng-tool-results{
+  flex:1;
+  min-width:0;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  padding-left:24px;
+  border-left:1px solid var(--line);
+}
+.rng-tool-heading{
+  flex-shrink:0;
+  font-family:'JetBrains Mono', monospace;
+  font-size:14px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--text-dim);
+  margin-bottom:12px;
+}
+.rng-tool-heading-secondary{
+  margin-top:22px;
 }
 .rng-tool-row{
   display:flex;
@@ -692,10 +726,40 @@ main.stage.stage-tools{
   font-size:13px;
   padding:8px 10px;
 }
+.rng-tool-mode-toggle{
+  display:flex;
+  gap:6px;
+}
+.rng-tool-mode-btn{
+  background:var(--panel-raised);
+  border:1px solid var(--line);
+  color:var(--text-dim);
+  font-family:'JetBrains Mono', monospace;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  transition:border-color .15s, color .15s;
+}
+.rng-tool-mode-btn:hover{color:var(--text);}
+.rng-tool-mode-btn.active{border-color:var(--leaf); color:var(--leaf);}
+.rng-tool-mode-btn:disabled{cursor:default; opacity:0.5;}
+.rng-tool-roll-wrap{
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
 .rng-tool-roll{
   display:flex;
-  gap:10px;
-  margin-top:22px;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
   background:none;
   border:0;
   padding:0;
@@ -703,13 +767,76 @@ main.stage.stage-tools{
   cursor:pointer;
   transition:color .15s, transform .1s;
 }
+.rng-tool-roll-dice{
+  display:flex;
+  gap:14px;
+}
+.rng-tool-roll-label{
+  font-family:'JetBrains Mono', monospace;
+  font-size:13px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
 .rng-tool-roll:hover{color:var(--leaf);}
 .rng-tool-roll:active{transform:scale(0.95);}
+.rng-tool-roll:disabled{cursor:default; opacity:0.5;}
+.rng-tool-roll:disabled:hover{color:var(--text-dim);}
+.rng-tool-roll:disabled:active{transform:none;}
 .rng-tool-result{
-  margin-top:18px;
+  flex-shrink:0;
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+}
+.rng-tool-result-value{
   font-family:'Archivo Black', sans-serif;
-  font-size:36px;
+  font-size:44px;
   color:var(--leaf);
+  line-height:1;
+}
+.rng-tool-result-value.rolling{
+  color:var(--text-dim);
+}
+.rng-tool-attempt{
+  font-family:'JetBrains Mono', monospace;
+  font-size:12px;
+  color:var(--text-dim);
+}
+.rng-tool-heading .rng-tool-attempt{
+  margin-left:8px;
+}
+.rng-tool-history{
+  flex:1;
+  min-height:0;
+  margin-top:4px;
+  display:flex;
+  gap:24px;
+  /* Every result is kept — no cap, no dropping old ones. Each column holds as many groups as
+     fit its measured height (see the columnCapacity calc in RngTool.tsx); once a column is
+     full, a new one starts rather than overflowing vertically, so this only ever needs to
+     scroll horizontally once there are more columns than fit the panel's width. */
+  overflow-x:auto;
+  overflow-y:hidden;
+}
+.rng-tool-history-col{
+  flex:0 0 auto;
+  display:flex;
+  flex-direction:column;
+}
+.rng-tool-history-group{
+  margin-bottom:16px;
+}
+.rng-tool-history-group:last-child{
+  margin-bottom:0;
+}
+.rng-tool-history-item{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:13px;
+  color:var(--text-dim);
+  padding:5px 0;
 }
 .tabs{
   display:flex;
