@@ -154,26 +154,26 @@ export function RngTool() {
             <span>Rolls</span>
             <input type="number" value={rolls} onChange={(e) => setRolls(e.target.value)} />
           </label>
-          <div className="rng-tool-field">
-            <span>Mode</span>
-            <div className="rng-tool-mode-toggle">
-              <button
-                type="button"
-                className={`rng-tool-mode-btn${mode === 'instant' ? ' active' : ''}`}
-                onClick={() => setMode('instant')}
-                disabled={rolling}
-              >
-                Instant
-              </button>
-              <button
-                type="button"
-                className={`rng-tool-mode-btn${mode === 'dramatic' ? ' active' : ''}`}
-                onClick={() => setMode('dramatic')}
-                disabled={rolling}
-              >
-                Dramatic
-              </button>
-            </div>
+        </div>
+        <div className="rng-tool-field rng-tool-mode-field">
+          <span>Mode</span>
+          <div className="rng-tool-mode-toggle">
+            <button
+              type="button"
+              className={`rng-tool-mode-btn${mode === 'instant' ? ' active' : ''}`}
+              onClick={() => setMode('instant')}
+              disabled={rolling}
+            >
+              Instant
+            </button>
+            <button
+              type="button"
+              className={`rng-tool-mode-btn${mode === 'dramatic' ? ' active' : ''}`}
+              onClick={() => setMode('dramatic')}
+              disabled={rolling}
+            >
+              Dramatic
+            </button>
           </div>
         </div>
         <div className="rng-tool-roll-wrap">

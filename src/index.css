@@ -721,16 +721,24 @@ main.stage.stage-tools{
   letter-spacing:0.5px;
   color:var(--text-dim);
 }
+.rng-tool-mode-field{
+  margin-top:12px;
+}
 .rng-tool-field input[type=number]{
   width:110px;
+  height:37px;
   font-size:13px;
   padding:8px 10px;
 }
 .rng-tool-mode-toggle{
   display:flex;
   gap:6px;
+  height:37px;
 }
 .rng-tool-mode-btn{
+  display:flex;
+  align-items:center;
+  height:100%;
   background:var(--panel-raised);
   border:1px solid var(--line);
   color:var(--text-dim);
@@ -738,7 +746,7 @@ main.stage.stage-tools{
   font-size:11px;
   text-transform:uppercase;
   letter-spacing:.5px;
-  padding:8px 12px;
+  padding:0 12px;
   border-radius:6px;
   cursor:pointer;
   transition:border-color .15s, color .15s;
