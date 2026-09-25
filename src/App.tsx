@@ -21,6 +21,7 @@ export default function App() {
   const { section, toolId, navigate } = useRoute();
   const [activeClip, setActiveClip] = useState<Clip | null>(null);
   const [addToListError, setAddToListError] = useState<string | null>(null);
+  const [headerCollapsed, setHeaderCollapsed] = useState(false);
 
   const searchCurrentClip = search.playingIndex >= 0 ? (search.clips[search.playingIndex] ?? null) : null;
   const currentClip = activeClip ?? searchCurrentClip;
@@ -41,19 +42,29 @@ export default function App() {
 
   return (
     <>
-      <Header
-        status={status}
-        displayName={displayName}
-        profileImageUrl={profileImageUrl}
-        connect={connect}
-        disconnect={disconnect}
-        channel={search.channel}
-        onChannelChange={search.setChannel}
-        onSearch={search.handleSearch}
-        searching={search.searching}
-        section={section}
-        onSectionChange={navigate}
-      />
+      {!headerCollapsed && (
+        <Header
+          status={status}
+          displayName={displayName}
+          profileImageUrl={profileImageUrl}
+          connect={connect}
+          disconnect={disconnect}
+          channel={search.channel}
+          onChannelChange={search.setChannel}
+          onSearch={search.handleSearch}
+          searching={search.searching}
+          section={section}
+          onSectionChange={navigate}
+        />
+      )}
+      <button
+        className="header-toggle"
+        onClick={() => setHeaderCollapsed((v) => !v)}
+        aria-label={headerCollapsed ? 'Show header' : 'Hide header'}
+        title={headerCollapsed ? 'Show header' : 'Hide header'}
+      >
+        {headerCollapsed ? '▾' : '▴'}
+      </button>
       {section === 'clips' && (
         <div className="local-time-note">All dates and times shown are your local time.</div>
       )}
