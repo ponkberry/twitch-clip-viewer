@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-const SPIN_DURATION_MS = 4000;
+const DEFAULT_SPIN_DURATION_SEC = 4;
 const EXTRA_SPINS = 5;
 const DEFAULT_OPTIONS = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
 const WHEEL_COLORS = ['#5FA85F', '#6FB6A8', '#E8735D', '#E0B454', '#7A93C9', '#B77FD1', '#D98E5D', '#5FA0A8'];
@@ -28,6 +28,7 @@ const STORAGE_KEY = 'wheel_configs';
 interface StoredConfigState {
   configs: WheelConfig[];
   activeConfigId: string;
+  spinDurationSec: number;
 }
 
 // Deliberately localStorage rather than the sessionStorage convention used elsewhere (auth
@@ -36,19 +37,25 @@ interface StoredConfigState {
 function loadStoredConfigs(): StoredConfigState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { configs: INITIAL_CONFIGS, activeConfigId: INITIAL_CONFIGS[0].id };
+    if (!raw) {
+      return { configs: INITIAL_CONFIGS, activeConfigId: INITIAL_CONFIGS[0].id, spinDurationSec: DEFAULT_SPIN_DURATION_SEC };
+    }
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed.configs) || parsed.configs.length === 0) {
-      return { configs: INITIAL_CONFIGS, activeConfigId: INITIAL_CONFIGS[0].id };
+      return { configs: INITIAL_CONFIGS, activeConfigId: INITIAL_CONFIGS[0].id, spinDurationSec: DEFAULT_SPIN_DURATION_SEC };
     }
     const activeConfigId =
       typeof parsed.activeConfigId === 'string' &&
       parsed.configs.some((c: WheelConfig) => c.id === parsed.activeConfigId)
         ? parsed.activeConfigId
         : parsed.configs[0].id;
-    return { configs: parsed.configs, activeConfigId };
+    const spinDurationSec =
+      typeof parsed.spinDurationSec === 'number' && parsed.spinDurationSec > 0
+        ? parsed.spinDurationSec
+        : DEFAULT_SPIN_DURATION_SEC;
+    return { configs: parsed.configs, activeConfigId, spinDurationSec };
   } catch {
-    return { configs: INITIAL_CONFIGS, activeConfigId: INITIAL_CONFIGS[0].id };
+    return { configs: INITIAL_CONFIGS, activeConfigId: INITIAL_CONFIGS[0].id, spinDurationSec: DEFAULT_SPIN_DURATION_SEC };
   }
 }
 
@@ -67,6 +74,7 @@ function sliceParts(cx: number, cy: number, r: number, startAngle: number, endAn
 export function WheelTool() {
   const [configs, setConfigs] = useState<WheelConfig[]>(() => loadStoredConfigs().configs);
   const [activeConfigId, setActiveConfigId] = useState(() => loadStoredConfigs().activeConfigId);
+  const [spinDurationSec, setSpinDurationSec] = useState(() => String(loadStoredConfigs().spinDurationSec));
   const [newConfigName, setNewConfigName] = useState('');
   const [creatingConfig, setCreatingConfig] = useState(false);
   const [newOption, setNewOption] = useState('');
@@ -77,6 +85,7 @@ export function WheelTool() {
   const [history, setHistory] = useState<Spin[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('results');
+  const [popupResult, setPopupResult] = useState<Spin | null>(null);
   const nextAttempt = useRef(1);
   const mountedRef = useRef(true);
 
@@ -88,11 +97,22 @@ export function WheelTool() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ configs, activeConfigId }));
-  }, [configs, activeConfigId]);
+    const parsedDurationSec = Number(spinDurationSec);
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        configs,
+        activeConfigId,
+        spinDurationSec: Number.isFinite(parsedDurationSec) && parsedDurationSec > 0 ? parsedDurationSec : DEFAULT_SPIN_DURATION_SEC,
+      }),
+    );
+  }, [configs, activeConfigId, spinDurationSec]);
 
   const activeConfig = configs.find((c) => c.id === activeConfigId) ?? configs[0];
   const options = activeConfig.options;
+  const parsedDurationSec = Number(spinDurationSec);
+  const spinDurationMs =
+    Number.isFinite(parsedDurationSec) && parsedDurationSec > 0 ? parsedDurationSec * 1000 : DEFAULT_SPIN_DURATION_SEC * 1000;
 
   function updateActiveOptions(updater: (prev: string[]) => string[]) {
     setConfigs((prev) => prev.map((c) => (c.id === activeConfigId ? { ...c, options: updater(c.options) } : c)));
@@ -170,7 +190,13 @@ export function WheelTool() {
       setError('Add at least 2 options to spin.');
       return;
     }
+    if (!Number.isFinite(parsedDurationSec) || parsedDurationSec <= 0) {
+      setError('Spin duration must be a positive number of seconds.');
+      return;
+    }
     setError(null);
+    setPopupResult(null);
+    setTab('results');
     setSpinning(true);
 
     const seg = 360 / options.length;
@@ -187,7 +213,7 @@ export function WheelTool() {
     const newRotation = rotation + EXTRA_SPINS * 360 + delta;
     setRotation(newRotation);
 
-    await delay(SPIN_DURATION_MS);
+    await delay(spinDurationMs);
     if (!mountedRef.current) return;
 
     const winner = options[targetIndex];
@@ -199,6 +225,7 @@ export function WheelTool() {
     const attempt = nextAttempt.current++;
     setHistory((prev) => [{ attempt, winner }, ...prev]);
     setSpinning(false);
+    setPopupResult({ attempt, winner });
   }
 
   const seg = options.length > 0 ? 360 / options.length : 0;
@@ -215,7 +242,7 @@ export function WheelTool() {
             <svg
               className="wheel-svg"
               viewBox="0 0 200 200"
-              style={{ transform: `rotate(${rotation}deg)`, transitionDuration: `${SPIN_DURATION_MS}ms` }}
+              style={{ transform: `rotate(${rotation}deg)`, transitionDuration: `${spinDurationMs}ms` }}
             >
               {(() => {
                 // More slices need smaller text, since each label now runs lengthwise down its
@@ -311,6 +338,17 @@ export function WheelTool() {
         {tab === 'config' ? (
           <div className="wheel-config-tab">
             <div className="wheel-config-header">
+              <label className="wheel-duration-row">
+                <span className="wheel-duration-label">Spin Duration (seconds)</span>
+                <input
+                  type="number"
+                  className="wheel-duration-input"
+                  min="0.5"
+                  step="0.5"
+                  value={spinDurationSec}
+                  onChange={(e) => setSpinDurationSec(e.target.value)}
+                />
+              </label>
               <div className="wheel-config-select-row">
                 <select
                   className="wheel-config-select"
@@ -466,6 +504,18 @@ export function WheelTool() {
           </div>
         )}
       </div>
+
+      {popupResult && (
+        <div className="wheel-result-popup-backdrop" onClick={() => setPopupResult(null)}>
+          <div className="wheel-result-popup" onClick={(e) => e.stopPropagation()}>
+            <div className="wheel-result-popup-label">We've selected</div>
+            <div className="wheel-result-popup-value">{popupResult.winner}</div>
+            <button className="primary" onClick={() => setPopupResult(null)}>
+              Nice!
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
