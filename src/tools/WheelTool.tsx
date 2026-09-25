@@ -508,7 +508,7 @@ export function WheelTool() {
       {popupResult && (
         <div className="wheel-result-popup-backdrop" onClick={() => setPopupResult(null)}>
           <div className="wheel-result-popup" onClick={(e) => e.stopPropagation()}>
-            <div className="wheel-result-popup-label">We have a winner!</div>
+            <div className="wheel-result-popup-label">We've selected</div>
             <div className="wheel-result-popup-value">{popupResult.winner}</div>
             <button className="primary" onClick={() => setPopupResult(null)}>
               Nice!
