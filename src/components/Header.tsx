@@ -6,6 +6,7 @@ interface HeaderProps {
   status: TwitchAuthStatus;
   displayName: string | null;
   profileImageUrl: string | null;
+  connect: () => void;
   disconnect: () => void;
   channel: string;
   onChannelChange: (value: string) => void;
@@ -19,6 +20,7 @@ export function Header({
   status,
   displayName,
   profileImageUrl,
+  connect,
   disconnect,
   channel,
   onChannelChange,
@@ -98,7 +100,9 @@ export function Header({
             )}
           </div>
         ) : (
-          <div className="frame-count mono">{status === 'connecting' ? 'Connecting…' : 'Not connected'}</div>
+          <button className="primary header-connect-btn" onClick={connect} disabled={status === 'connecting'}>
+            {status === 'connecting' ? 'Connecting…' : 'Connect with Twitch'}
+          </button>
         )}
       </div>
 

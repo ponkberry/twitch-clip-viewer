@@ -45,6 +45,7 @@ export default function App() {
         status={status}
         displayName={displayName}
         profileImageUrl={profileImageUrl}
+        connect={connect}
         disconnect={disconnect}
         channel={search.channel}
         onChannelChange={search.setChannel}
@@ -105,7 +106,7 @@ export default function App() {
             </aside>
           </div>
         ) : (
-          <TwitchAuth status={status} error={error} connect={connect} />
+          <TwitchAuth status={status} error={error} />
         )}
       </main>
     </>
