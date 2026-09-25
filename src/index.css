@@ -119,10 +119,10 @@ header{
   text-transform:uppercase;
 }
 .brand h1 span{color:var(--leaf);}
-.frame-count{
-  font-family:'JetBrains Mono', monospace;
-  font-size:12px;
-  color:var(--text-dim);
+.header-connect-btn{
+  flex-shrink:0;
+  font-size:12.5px;
+  padding:8px 16px;
 }
 
 /* ---- avatar / account menu ---- */
